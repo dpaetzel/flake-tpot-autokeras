@@ -15,6 +15,11 @@
       url = "github:keras-team/autokeras/1.0.16";
       flake = false;
     };
+
+    tpotSrc = {
+      url = "github:EpistasisLab/tpot/v0.11.7";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, nixpkgs-tf24, overlays, ... }:
@@ -52,6 +57,7 @@
                 sed -i "s/.*tensorflow.*//" setup.py
               '';
 
+              # From install_requires.
               propagatedBuildInputs = [
                 final.tensorflow24
                 prev.keras-tuner
@@ -61,6 +67,33 @@
               ];
 
               doCheck = false;
+            };
+
+            tpot = prev.buildPythonPackage {
+              pname = "tpot";
+              version = "0.11.7";
+              src = inputs.tpotSrc;
+
+              # From install_requires.
+              propagatedBuildInputs = with prev; [
+                numpy
+                scipy
+                scikit-learn
+                deap
+                update_checker
+                tqdm
+                stopit
+                pandas
+                joblib
+                xgboost
+              ];
+
+              doCheck = false;
+            };
+
+            pytorch = prev.pytorch.override rec {
+              cudaSupport = true;
+              inherit cudnn cudatoolkit magma;
             };
           }))
         ];
@@ -77,6 +110,7 @@
       cudnn = pkgs.cudnn_cudatoolkit_11_2;
       nvidia = pkgs.linuxPackages.nvidia_x11;
       cc = pkgs.stdenv.cc.cc;
+      magma = pkgs.magma.override { inherit cudatoolkit; };
 
     in rec {
 
@@ -88,7 +122,10 @@
           }:$LD_LIBRARY_PATH";
             unset SOURCE_DATE_EPOCH
         '';
-        buildInputs = [ (python.withPackages (ps: [ ps.autokeras ])) ];
+        buildInputs = [
+          (python.withPackages
+            (ps: with ps; [ autokeras matplotlib pytorch tpot ]))
+        ];
       };
 
     };
