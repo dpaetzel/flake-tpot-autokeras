@@ -25,7 +25,7 @@
       # CUDA needs to be fixed. See
       # https://github.com/NixOS/nixpkgs/blob/4afca382d80b68bff9e154a97210e5a7bf5df8b3/pkgs/development/python-modules/tensorflow/default.nix#L45
       cudatoolkit = pkgs.cudaPackages.cudatoolkit_11_2;
-      cudatoolkit_joined = pkgs.symlinkJoin {
+      cudatoolkitJoined = pkgs.symlinkJoin {
         name = "${cudatoolkit.name}-merged";
         paths = [ cudatoolkit.lib cudatoolkit.out ];
       };
@@ -37,7 +37,7 @@
         venvDir = "./.venv";
         postShellHook = ''
           export LD_LIBRARY_PATH="${
-            pkgs.lib.makeLibraryPath [ cc cudatoolkit_joined cudnn nvidia ]
+            pkgs.lib.makeLibraryPath [ cc cudatoolkitJoined cudnn nvidia ]
           }:$LD_LIBRARY_PATH";
 
           unset SOURCE_DATE_EPOCH
@@ -49,9 +49,9 @@
           unset SOURCE_DATE_EPOCH
           pip install -r requirements.txt
         '';
+
         buildInputs = [
           python.pkgs.python
-
           python.pkgs.venvShellHook
         ];
       };
