@@ -1,6 +1,8 @@
-autokeras==1.0.16
-keras-tuner==1.0.4
 matplotlib
-tensorflow-gpu==2.5.0
 torch
 tpot
+
+autokeras==1.0.18
+keras-tuner==1.1.1
+tensorflow==2.8.0
+tensorboard==2.8.0

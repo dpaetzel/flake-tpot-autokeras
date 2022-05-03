@@ -37,7 +37,7 @@
         venvDir = "./.venv";
         postShellHook = ''
           export LD_LIBRARY_PATH="${
-            pkgs.lib.makeLibraryPath [ cc cudatoolkitJoined cudnn nvidia ]
+            pkgs.lib.makeLibraryPath [ cc cudatoolkitJoined cudnn nvidia pkgs.zlib ]
           }:$LD_LIBRARY_PATH";
 
           unset SOURCE_DATE_EPOCH
